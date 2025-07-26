@@ -48,6 +48,11 @@ const getSortParams = (sortBy = 'createdAt', sortOrder = 'desc') => {
 const getFilterParams = (query) => {
   const filter = { isArchived: query.archived === 'true' };
 
+  // Favorite filter
+  if (query.favorite !== undefined) {
+    filter.isFavorite = query.favorite === 'true';
+  }
+
   // Category filter
   if (query.category) {
     filter.category = query.category;
@@ -178,6 +183,11 @@ const validateNoteData = (noteData) => {
   // Boolean fields
   if (typeof noteData.isArchived === 'boolean') {
     sanitized.isArchived = noteData.isArchived;
+  }
+
+  // Favorite field
+  if (typeof noteData.isFavorite === 'boolean') {
+    sanitized.isFavorite = noteData.isFavorite;
   }
 
   return sanitized;

@@ -64,6 +64,11 @@ const noteSchema = new mongoose.Schema({
     default: false,
     index: true
   },
+  isFavorite: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
   priority: {
     type: String,
     enum: {
@@ -100,6 +105,8 @@ noteSchema.index({ tags: 1 });
 noteSchema.index({ createdAt: -1 });
 noteSchema.index({ isArchived: 1, createdAt: -1 });
 noteSchema.index({ priority: 1, createdAt: -1 });
+noteSchema.index({ isFavorite: 1, createdAt: -1 });
+noteSchema.index({ updatedAt: -1 });
 
 // Text search index for title and content
 noteSchema.index({ 
@@ -161,6 +168,27 @@ noteSchema.methods.removeTag = function(tag) {
   return this.save();
 };
 
+noteSchema.methods.toggleFavorite = function() {
+  this.isFavorite = !this.isFavorite;
+  return this.save();
+};
+
+noteSchema.methods.duplicate = async function() {
+  const Note = this.constructor;
+  const duplicateData = this.toObject();
+  
+  // Remove fields that should not be duplicated
+  delete duplicateData._id;
+  delete duplicateData.createdAt;
+  delete duplicateData.updatedAt;
+  
+  // Modify title to indicate it's a copy
+  duplicateData.title = `${duplicateData.title} (Copy)`;
+  
+  const duplicateNote = new Note(duplicateData);
+  return await duplicateNote.save();
+};
+
 // Static methods
 noteSchema.statics.findByCategory = function(category, includeArchived = false) {
   const filter = { category };
@@ -215,6 +243,9 @@ noteSchema.statics.getStats = async function() {
         activeNotes: {
           $sum: { $cond: [{ $eq: ['$isArchived', false] }, 1, 0] }
         },
+        favoriteNotes: {
+          $sum: { $cond: [{ $eq: ['$isFavorite', true] }, 1, 0] }
+        },
         categoryCounts: {
           $push: {
             category: '$category',
@@ -229,8 +260,143 @@ noteSchema.statics.getStats = async function() {
     totalNotes: 0,
     archivedNotes: 0,
     activeNotes: 0,
+    favoriteNotes: 0,
     categoryCounts: []
   };
+};
+
+// Bulk operations
+noteSchema.statics.bulkArchive = function(noteIds) {
+  return this.updateMany(
+    { _id: { $in: noteIds } },
+    { $set: { isArchived: true } }
+  );
+};
+
+noteSchema.statics.bulkUnarchive = function(noteIds) {
+  return this.updateMany(
+    { _id: { $in: noteIds } },
+    { $set: { isArchived: false } }
+  );
+};
+
+noteSchema.statics.bulkDelete = function(noteIds) {
+  return this.deleteMany({ _id: { $in: noteIds } });
+};
+
+noteSchema.statics.bulkAddTag = function(noteIds, tag) {
+  const sanitizedTag = tag.toLowerCase().trim();
+  return this.updateMany(
+    { _id: { $in: noteIds } },
+    { $addToSet: { tags: sanitizedTag } }
+  );
+};
+
+noteSchema.statics.bulkRemoveTag = function(noteIds, tag) {
+  const sanitizedTag = tag.toLowerCase().trim();
+  return this.updateMany(
+    { _id: { $in: noteIds } },
+    { $pull: { tags: sanitizedTag } }
+  );
+};
+
+noteSchema.statics.getRecentlyModified = function(days = 7, includeArchived = false) {
+  const sinceDate = new Date();
+  sinceDate.setDate(sinceDate.getDate() - days);
+  
+  const filter = {
+    updatedAt: { $gte: sinceDate }
+  };
+  
+  if (!includeArchived) {
+    filter.isArchived = false;
+  }
+  
+  return this.find(filter).sort({ updatedAt: -1 });
+};
+
+noteSchema.statics.getFavorites = function(includeArchived = false) {
+  const filter = { isFavorite: true };
+  if (!includeArchived) {
+    filter.isArchived = false;
+  }
+  return this.find(filter).sort({ updatedAt: -1 });
+};
+
+noteSchema.statics.advancedSearch = function(searchParams) {
+  const { 
+    text, 
+    category, 
+    type, 
+    priority, 
+    tags, 
+    isArchived, 
+    isFavorite,
+    dateFrom,
+    dateTo
+  } = searchParams;
+  
+  const filter = {};
+  const andConditions = [];
+  
+  // Text search
+  if (text && text.trim()) {
+    andConditions.push({
+      $or: [
+        { title: { $regex: text, $options: 'i' } },
+        { content: { $regex: text, $options: 'i' } },
+        { tags: { $in: [new RegExp(text, 'i')] } }
+      ]
+    });
+  }
+  
+  // Category filter
+  if (category) {
+    filter.category = category;
+  }
+  
+  // Type filter
+  if (type) {
+    filter.type = type;
+  }
+  
+  // Priority filter
+  if (priority) {
+    filter.priority = priority;
+  }
+  
+  // Tags filter (all provided tags must be present)
+  if (tags && tags.length > 0) {
+    filter.tags = { $all: tags };
+  }
+  
+  // Archive status
+  if (typeof isArchived === 'boolean') {
+    filter.isArchived = isArchived;
+  }
+  
+  // Favorite status
+  if (typeof isFavorite === 'boolean') {
+    filter.isFavorite = isFavorite;
+  }
+  
+  // Date range
+  if (dateFrom || dateTo) {
+    filter.createdAt = {};
+    if (dateFrom) {
+      filter.createdAt.$gte = new Date(dateFrom);
+    }
+    if (dateTo) {
+      filter.createdAt.$lte = new Date(dateTo);
+    }
+  }
+  
+  // Combine all conditions
+  if (andConditions.length > 0) {
+    filter.$and = andConditions;
+  }
+  
+  return this.find(filter).sort({ updatedAt: -1 });
 };
 
 // Create and export the model
