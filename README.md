@@ -1,32 +1,63 @@
 # JD Notes Backend
 
-A RESTful API backend for managing JD (John Doe) notes with categories, types, and tagging system. Built with Express.js and MongoDB.
+A comprehensive RESTful API backend for managing notes with user authentication, categories, and advanced features. Built with Express.js, MongoDB, and JWT authentication.
 
-## Features
+## 🚀 Features
 
+### 🔐 **Authentication System**
+- User registration and login with JWT tokens
+- Password strength validation and secure hashing
+- Account security (rate limiting, account locking)
+- Token refresh mechanism
+- Profile management
+
+### 📝 **Notes Management**
 - **CRUD Operations**: Create, read, update, and delete notes
-- **Categorization**: Organize notes by categories (Sermons, Prayer, Bible Study, etc.)
+- **Categorization**: Organize notes by categories (Personal, Work, Study, etc.)
 - **Tagging System**: Add multiple tags to notes for better organization
 - **Search Functionality**: Search notes by title, content, or tags
 - **Pagination**: Efficient data loading with pagination support
 - **Archive System**: Archive/unarchive notes without deleting them
-- **Priority Levels**: Set priority levels (low, medium, high) for notes
-- **MongoDB Integration**: Robust data persistence with MongoDB
-- **Error Handling**: Comprehensive error handling and validation
-- **CORS Support**: Ready for frontend integration
+- **Priority Levels**: Set priority levels (low, medium, high, urgent) for notes
+- **Statistics**: Get overview statistics and analytics
 
-## Tech Stack
+### 🛡️ **Security & Performance**
+- JWT-based stateless authentication
+- Password hashing with bcrypt
+- Input sanitization and validation
+- CORS configuration
+- Rate limiting for login attempts
+- MongoDB injection protection
+- Comprehensive error handling
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Security**: Helmet.js for security headers
-- **Logging**: Morgan for HTTP request logging
+## 📚 API Documentation
+
+**Complete API documentation is available in the `/docs` folder:**
+
+- **[📖 API Overview](./docs/README.md)** - Complete documentation index
+- **[🔐 Authentication API](./docs/AUTH_API.md)** - User auth endpoints and integration
+- **[📝 Notes API](./docs/NOTES_API.md)** - Notes management endpoints and examples
+
+### Quick API Reference
+
+| Base URL | Description |
+|----------|-------------|
+| `/api/auth/*` | Authentication endpoints (register, login, logout, profile) |
+| `/api/notes/*` | Notes CRUD operations and management |
+
+## 🛠️ Tech Stack
+
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js 4.18.2
+- **Database**: MongoDB with Mongoose ODM 8.0.3
+- **Authentication**: JSON Web Tokens (JWT)
+- **Security**: Helmet.js, bcryptjs, input validation
 - **Development**: Nodemon for auto-restart
+- **Deployment**: Vercel serverless functions
 
-## Prerequisites
+## 🔧 Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - MongoDB (local installation or MongoDB Atlas)
 - npm or yarn
 
