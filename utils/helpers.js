@@ -192,6 +192,48 @@ const isValidObjectId = (id) => {
   return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
+/**
+ * Sanitize user input to prevent XSS and injection attacks
+ * @param {string} input - Input string to sanitize
+ * @returns {string} Sanitized string
+ */
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') {
+    return '';
+  }
+  
+  return input
+    .replace(/[<>]/g, '') // Remove potential HTML tags
+    .replace(/['"]/g, '') // Remove quotes
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .trim();
+};
+
+/**
+ * Validate email format
+ * @param {string} email - Email to validate
+ * @returns {boolean} True if valid email format
+ */
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+/**
+ * Generate a random string for tokens/IDs
+ * @param {number} length - Length of random string
+ * @returns {string} Random string
+ */
+const generateRandomString = (length = 32) => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 module.exports = {
   getPaginationParams,
   getSortParams,
@@ -199,5 +241,8 @@ module.exports = {
   createApiResponse,
   createErrorResponse,
   validateNoteData,
-  isValidObjectId
+  isValidObjectId,
+  sanitizeInput,
+  validateEmail,
+  generateRandomString
 };
