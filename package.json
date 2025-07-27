@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "seed": "node scripts/seedData.js",
     "vercel-build": "echo 'Building for Vercel deployment'",
-    "test": "echo 'No tests specified'",
+    "test": "jest --testTimeout=30000",
+    "test:watch": "jest --watch --testTimeout=30000",
+    "test:coverage": "jest --coverage --testTimeout=30000",
     "lint": "echo 'Add ESLint configuration for linting'",
     "validate": "node -e \"console.log('✅ Package.json is valid')\"",
     "check-env": "node -e \"const vars=['MONGODB_URI', 'JWT_SECRET']; vars.forEach(v => process.env[v] ? console.log(`✅ ${v} is set`) : console.error(`❌ ${v} is missing`));\""
@@ -38,6 +40,21 @@
     "validator": "^13.15.15"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "jest": "^30.0.5",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": ["**/tests/**/*.test.js"],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/tests/**",
+      "!**/coverage/**",
+      "!server.js",
+      "!api/index.js"
+    ]
   }
 }
