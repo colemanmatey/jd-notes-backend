@@ -5,6 +5,99 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-07-26
+
+### Added
+- **Complete User Authentication System**
+  - JWT-based authentication with access and refresh tokens
+  - User registration with comprehensive validation
+  - Secure login/logout functionality
+  - Password strength validation and hashing (bcrypt)
+  - Account security features (rate limiting, account locking)
+  - Token refresh mechanism for seamless user experience
+
+- **User Management Features**
+  - User profile management (`/api/auth/me`)
+  - Password change functionality
+  - Account status tracking (active/inactive)
+  - Last login timestamp tracking
+  - Failed login attempt monitoring
+
+- **Security Enhancements**
+  - Input sanitization for XSS prevention
+  - Rate limiting for login attempts (5 attempts per 15 minutes)
+  - Account locking after failed attempts (2-hour lockout)
+  - Strong password requirements with validation
+  - JWT secret configuration for production security
+
+- **New Dependencies**
+  - `bcryptjs` (v2.4.3) - Password hashing
+  - `jsonwebtoken` (v9.0.2) - JWT token management
+  - `validator` (v13.11.0) - Input validation utilities
+
+- **API Documentation**
+  - Comprehensive authentication API documentation (`docs/AUTH_API.md`)
+  - Frontend integration examples and React components
+  - Error handling patterns and response schemas
+  - Security best practices guide
+
+### Enhanced
+- **User Model** (`models/User.js`)
+  - Mongoose schema with validation and security features
+  - Instance methods for password comparison and login tracking
+  - Static methods for user lookup and statistics
+  - Virtual properties for account status
+
+- **Authentication Utilities** (`utils/auth.js`)
+  - JWT token generation and verification
+  - Password strength calculation
+  - Authentication middleware for protected routes
+  - Rate limiting helpers
+
+- **Helper Functions** (`utils/helpers.js`)
+  - Input sanitization functions
+  - Email validation utilities
+  - Random string generation for tokens
+
+- **API Routes**
+  - `/api/auth/register` - User registration
+  - `/api/auth/login` - User authentication
+  - `/api/auth/logout` - User logout
+  - `/api/auth/me` - Get current user profile
+  - `/api/auth/refresh` - Refresh access tokens
+  - `/api/auth/change-password` - Change user password
+
+### Technical Improvements
+
+#### Authentication Architecture
+- **Stateless JWT System**: No server-side session storage required
+- **Token Pair Strategy**: Short-lived access tokens + long-lived refresh tokens
+- **Middleware Integration**: Seamless protection for API endpoints
+- **Error Handling**: Consistent error responses across all auth endpoints
+
+#### Security Implementation
+- **Password Hashing**: bcrypt with cost factor 12 for optimal security
+- **Token Expiration**: Configurable token lifetimes (7d access, 30d refresh)
+- **Account Protection**: Progressive security measures for suspicious activity
+- **Input Validation**: Multi-layer validation on client and server
+
+#### Database Schema
+- **User Collection**: Comprehensive user data model with security fields
+- **Indexing Strategy**: Optimized queries for email and username lookups
+- **Data Sanitization**: Automatic password field exclusion from responses
+- **Audit Trail**: Creation and update timestamps for all user records
+
+### Environment Variables
+- `JWT_SECRET` - Secret key for JWT token signing (required for production)
+- `JWT_EXPIRES_IN` - Access token expiration time (default: 7d)
+- `JWT_REFRESH_EXPIRES_IN` - Refresh token expiration time (default: 30d)
+
+### Frontend Integration
+- Complete React integration examples with hooks and context
+- Token management utilities for automatic refresh
+- HTTP interceptors for seamless API communication
+- Protected route components for authentication gates
+
 ## [1.0.0] - 2025-07-25
 
 ### Added
