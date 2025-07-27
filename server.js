@@ -8,6 +8,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const notesRoutes = require('./routes/notes');
+const authRoutes = require('./routes/auth');
 const { connectToDatabase, closeDatabase } = require('./config/database');
 const { corsOptions, helmetOptions } = require('./config/middleware');
 const { HTTP_STATUS, API_MESSAGES } = require('./constants/api');
@@ -54,6 +55,7 @@ connectToDatabase()
 
 // Routes
 app.use('/api/notes', notesRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {

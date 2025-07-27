@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 const notesRoutes = require('../routes/notes');
+const authRoutes = require('../routes/auth');
 const { connectToDatabase } = require('../config/database');
 const { corsOptions, helmetOptions } = require('../config/middleware');
 const { HTTP_STATUS, API_MESSAGES } = require('../constants/api');
@@ -29,7 +30,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
-app.use('/api/notes', notesRoutes);
+// Routes (no /api prefix needed in serverless function)
+app.use('/notes', notesRoutes);
+app.use('/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
