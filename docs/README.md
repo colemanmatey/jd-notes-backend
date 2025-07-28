@@ -1,6 +1,6 @@
 # JD Notes Backend API Documentation
 
-Welcome to the comprehensive API documentation for the JD Notes Backend. This documentation covers all available endpoints, authentication, data models, and integration examples.
+Welcome to the comprehensive API documentation for the JD Notes Backend. This documentation covers all available endpoints, authentication, data models, error handling, and complete integration examples to prevent internal server errors.
 
 ## 📚 Documentation Overview
 
@@ -8,8 +8,8 @@ This API provides a complete notes management system with user authentication. T
 
 ### 🔗 Quick Links
 
-- **[Authentication API](./AUTH_API.md)** - User registration, login, logout, and profile management
-- **[Notes API](./NOTES_API.md)** - Complete notes CRUD operations, filtering, and statistics
+- **[Authentication API](./AUTH_API.md)** - Complete user authentication system with troubleshooting
+- **[Notes API](./NOTES_API.md)** - Full notes CRUD operations with comprehensive error handling
 
 ---
 
@@ -26,18 +26,21 @@ This API provides a complete notes management system with user authentication. T
 
 ```
 /api/
-├── auth/          # Authentication endpoints
+├── health         # System health check
+├── auth/          # Authentication endpoints (6 endpoints)
 │   ├── register   # User registration
-│   ├── login      # User login
+│   ├── login      # User login  
 │   ├── logout     # User logout
-│   ├── me         # Get current user
-│   ├── refresh    # Refresh token
-│   └── change-password # Change password
-└── notes/         # Notes management endpoints
-    ├── /          # CRUD operations
-    ├── stats/     # Statistics
-    ├── categories/ # Categories management
-    └── tags/      # Tags management
+│   ├── me         # Get current user profile
+│   ├── refresh    # Refresh access token
+│   └── change-password # Change user password
+└── notes/         # Notes management endpoints (10 endpoints)
+    ├── /          # CRUD operations (GET, POST, PUT, DELETE)
+    ├── /:id/archive   # Archive note
+    ├── /:id/unarchive # Unarchive note
+    ├── stats/overview # Notes statistics
+    ├── categories/list # Available categories
+    └── tags/list  # Available tags
 ```
 
 ---
@@ -46,12 +49,27 @@ This API provides a complete notes management system with user authentication. T
 
 The API uses **JWT (JSON Web Tokens)** for stateless authentication with the following features:
 
-- ✅ User registration with validation
-- ✅ Secure login/logout
+- ✅ User registration with comprehensive validation
+- ✅ Secure login/logout with rate limiting
+- ✅ Account locking after failed attempts
+- ✅ Password strength requirements
+- ✅ Automatic token refresh
+- ✅ Complete error handling and troubleshooting guides
 - ✅ Password strength requirements
 - ✅ Account security (rate limiting, account locking)
-- ✅ Token refresh mechanism
-- ✅ Profile management
+- ✅ Automatic token refresh
+- ✅ Complete error handling and troubleshooting guides
+
+### 🛡️ Error Prevention Features
+
+Our documentation includes comprehensive guides to prevent common frontend integration issues:
+
+- **Detailed Validation Rules** - Exact field requirements and constraints
+- **Complete Error Response Examples** - All possible error scenarios covered
+- **Input Validation Guides** - Prevent 400 validation errors
+- **Rate Limiting Documentation** - Handle 429 rate limit responses  
+- **Troubleshooting Sections** - Step-by-step problem resolution
+- **Testing Checklists** - Verify implementation before deployment
 
 ### Authentication Flow
 
@@ -67,25 +85,56 @@ The API uses **JWT (JSON Web Tokens)** for stateless authentication with the fol
 
 ## 📝 Notes Management System
 
-Comprehensive notes management with advanced features:
+Comprehensive notes management with advanced features designed for spiritual note-taking:
 
 - ✅ Full CRUD operations (Create, Read, Update, Delete)
 - ✅ Advanced filtering and search
-- ✅ Categorization and tagging
+- ✅ Spiritual categorization (Sermons, Prayer, Bible Study, etc.)
 - ✅ Priority levels and archiving
 - ✅ Statistics and analytics
 - ✅ Pagination and sorting
+- ✅ Complete validation and error handling
 
 ### Available Categories
-- Personal, Work, Study, Projects, Ideas, Reminders, Other
+- **Sermons**, **Prayer**, **Bible Study**, **General**, **Ministry**, **Personal**
 
-### Note Types
-- Note, Task, Reminder, Idea, Draft
+### Note Types  
+- **sermon**, **prayer**, **study**, **general**, **ministry**, **personal**
 
 ### Priority Levels
-- Low, Medium, High, Urgent
+- **low**, **medium**, **high**
 
 **📖 [View Complete Notes API Documentation](./NOTES_API.md)**
+
+---
+
+## 🚨 Preventing Internal Server Errors
+
+Our documentation is specifically designed to help frontend developers avoid common issues that cause 500 internal server errors:
+
+### ✅ Input Validation Covered
+- All required fields clearly documented
+- Exact validation rules and constraints
+- Valid values for enums (categories, types, priorities)
+- Field length limits and format requirements
+
+### ✅ Error Handling Comprehensive
+- Complete error response examples for all endpoints
+- HTTP status code meanings and appropriate actions
+- Specific error messages and troubleshooting steps
+- Network error handling patterns
+
+### ✅ Data Format Specifications
+- Exact JSON structure for requests and responses
+- Date format requirements (ISO 8601)
+- ObjectId format validation
+- Query parameter constraints
+
+### ✅ Testing Guidance
+- Pre-deployment testing checklists
+- Edge case testing scenarios
+- Common mistake examples and solutions
+- Error reproduction and debugging tips
 
 ---
 
