@@ -86,10 +86,73 @@ Register a new user account.
 ```
 
 #### Validation Rules
-- **username**: 3-30 characters, alphanumeric + underscore only
-- **email**: Valid email format
-- **password**: Minimum 8 characters with uppercase, lowercase, number, and special character
-- **firstName/lastName**: Required, max 50 characters
+- **username**: 3-30 characters, alphanumeric + underscore only, required
+- **email**: Valid email format, must be unique, required
+- **password**: Minimum 8 characters with:
+  - At least one uppercase letter (A-Z)
+  - At least one lowercase letter (a-z)
+  - At least one number (0-9)
+  - At least one special character (!@#$%^&*(),.?":{}|<>)
+- **firstName**: Required, 1-50 characters, letters and spaces only
+- **lastName**: Required, 1-50 characters, letters and spaces only
+
+#### Common Validation Errors
+```javascript
+// Missing fields (400)
+{
+  "error": "Validation Error",
+  "message": "All fields are required",
+  "required": ["username", "email", "password", "firstName", "lastName"]
+}
+
+// Invalid email format (400)
+{
+  "error": "Validation Error",
+  "message": "Please provide a valid email address"
+}
+
+// Weak password (400)
+{
+  "error": "Validation Error",
+  "message": "Password does not meet requirements",
+  "requirements": [
+    "Password must contain at least one uppercase letter",
+    "Password must contain at least one special character"
+  ],
+  "passwordStrength": "weak"
+}
+
+// Email already exists (409)
+{
+  "error": "User Already Exists",
+  "message": "An account with this email already exists"
+}
+
+// Username already taken (409)
+{
+  "error": "User Already Exists", 
+  "message": "This username is already taken"
+}
+
+// Database validation error (400)
+{
+  "error": "Validation Error",
+  "message": "Invalid input data",
+  "details": ["Path `email` is required.", "Username must be unique."]
+}
+
+// Duplicate key error (409)
+{
+  "error": "Duplicate Entry",
+  "message": "email already exists"
+}
+
+// Server error (500)
+{
+  "error": "Internal server error",
+  "message": "Failed to create account"
+}
+```
 
 #### Success Response (201)
 ```javascript
@@ -116,23 +179,48 @@ Register a new user account.
 
 #### Error Responses
 ```javascript
-// Validation Error (400)
+// Missing credentials (400)
 {
   "error": "Validation Error",
-  "message": "Password does not meet requirements",
-  "requirements": [
-    "Password must contain at least one uppercase letter",
-    "Password must contain at least one special character"
-  ],
-  "passwordStrength": "weak"
+  "message": "Email/username and password are required"
 }
 
-// User Already Exists (409)
+// Invalid Credentials (401)
 {
-  "error": "User Already Exists",
-  "message": "An account with this email already exists"
+  "error": "Authentication Failed",
+  "message": "Invalid credentials"
+}
+
+// Account Locked (401)
+{
+  "error": "Account Locked",
+  "message": "Account is temporarily locked due to too many failed login attempts"
+}
+
+// Account Inactive (401)
+{
+  "error": "Account Inactive",
+  "message": "Your account has been deactivated"
+}
+
+// Rate Limited (429)
+{
+  "error": "Too Many Attempts",
+  "message": "Too many login attempts. Please try again later.",
+  "retryAfter": "15 minutes"
+}
+
+// Server error (500)
+{
+  "error": "Internal server error",
+  "message": "Login failed"
 }
 ```
+
+#### Rate Limiting
+- **Login attempts**: Maximum 5 failed attempts per IP address within 15 minutes
+- **Account locking**: Account locked after 5 failed password attempts
+- **Lockout duration**: Account automatically unlocked after 30 minutes
 
 ### 2. Login User
 
@@ -781,5 +869,198 @@ FRONTEND_URL=https://your-frontend-domain.com
 - All inputs are sanitized to prevent XSS
 - Email validation on both client and server
 - Username format validation (alphanumeric + underscore only)
+
+## Troubleshooting Guide
+
+### Common Frontend Implementation Issues
+
+#### 1. "Internal server error" on Registration
+
+**Cause**: Missing required fields or invalid data format
+
+**Solution**: Ensure all required fields are provided and properly formatted:
+
+```javascript
+// ✅ Correct format
+const registrationData = {
+  username: "john_doe",           // 3-30 chars, alphanumeric + underscore
+  email: "john@example.com",      // Valid email format
+  password: "SecurePass123!",     // Min 8 chars with requirements
+  firstName: "John",              // Required, 1-50 chars
+  lastName: "Doe"                 // Required, 1-50 chars
+};
+
+// ❌ Common mistakes
+const badData = {
+  username: "jo",                 // Too short (min 3 chars)
+  email: "invalid-email",         // Invalid format
+  password: "123",                // Too weak
+  firstName: "",                  // Empty required field
+  // lastName missing              // Missing required field
+};
+```
+
+#### 2. "Authentication Failed" on Login
+
+**Causes**:
+- Incorrect email/username or password
+- Account locked due to failed attempts
+- Account inactive
+
+**Solutions**:
+```javascript
+// Check for specific error messages
+try {
+  await login(credentials);
+} catch (error) {
+  if (error.response?.data?.error === 'Account Locked') {
+    // Show user account is locked, try again later
+    setError('Account temporarily locked. Try again in 30 minutes.');
+  } else if (error.response?.data?.error === 'Authentication Failed') {
+    // Invalid credentials
+    setError('Invalid email/username or password.');
+  } else {
+    setError('Login failed. Please try again.');
+  }
+}
+```
+
+#### 3. "Invalid Token" on Authenticated Requests
+
+**Causes**:
+- Token expired
+- Token malformed
+- Token not included in request
+
+**Solutions**:
+```javascript
+// Always include token in Authorization header
+const makeAuthenticatedRequest = async (url, data) => {
+  const token = localStorage.getItem('accessToken');
+  
+  if (!token) {
+    throw new Error('No access token found');
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`  // Include Bearer prefix
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (response.status === 401) {
+      // Token expired, try to refresh
+      await refreshToken();
+      // Retry request with new token
+    }
+    
+    return response.json();
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+};
+```
+
+#### 4. "Too Many Attempts" Error
+
+**Cause**: Rate limiting triggered
+
+**Solution**: Implement retry logic with delays:
+
+```javascript
+const handleRateLimit = (error) => {
+  if (error.response?.status === 429) {
+    const retryAfter = error.response.data.retryAfter || '15 minutes';
+    setError(`Too many attempts. Please try again in ${retryAfter}.`);
+    
+    // Disable form for specified time
+    setFormDisabled(true);
+    
+    // Optional: Set a timer to re-enable
+    setTimeout(() => {
+      setFormDisabled(false);
+      setError('');
+    }, 15 * 60 * 1000); // 15 minutes
+  }
+};
+```
+
+#### 5. CORS Issues
+
+**Cause**: Frontend and backend on different domains
+
+**Solution**: Ensure CORS is properly configured:
+
+```javascript
+// Backend already configured for CORS
+// If still having issues, check these:
+
+// 1. Make sure requests include credentials if needed
+fetch('/api/auth/login', {
+  method: 'POST',
+  credentials: 'include',  // Include if using cookies
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+});
+
+// 2. Check that frontend URL is in CORS whitelist
+// Contact backend team if domain not allowed
+```
+
+### Testing Your Implementation
+
+#### 1. Test Registration Flow
+```javascript
+// Test data for registration
+const testUser = {
+  username: "test_user_" + Date.now(),
+  email: `test${Date.now()}@example.com`,
+  password: "TestPassword123!",
+  firstName: "Test",
+  lastName: "User"
+};
+
+// Should receive success response with user data and tokens
+```
+
+#### 2. Test Login Flow
+```javascript
+// Use the same credentials from registration
+const loginData = {
+  identifier: testUser.email,  // or testUser.username
+  password: testUser.password
+};
+
+// Should receive user data and fresh tokens
+```
+
+#### 3. Test Token Refresh
+```javascript
+// Use the refresh token from login response
+const refreshData = {
+  refreshToken: "your-refresh-token-here"
+};
+
+// Should receive new access and refresh tokens
+```
+
+### Error Code Quick Reference
+
+| Status | Error Type | Meaning | Action |
+|--------|------------|---------|--------|
+| 400 | Validation Error | Invalid input data | Check field requirements |
+| 401 | Authentication Failed | Wrong credentials | Verify email/password |
+| 401 | Account Locked | Too many failed attempts | Wait 30 minutes |
+| 401 | Invalid Token | Token expired/invalid | Refresh token or re-login |
+| 409 | User Already Exists | Email/username taken | Use different credentials |
+| 429 | Too Many Attempts | Rate limited | Wait 15 minutes |
+| 500 | Internal Server Error | Server issue | Contact support |
 
 This documentation should provide your frontend team with everything they need to implement authentication in your React application!
