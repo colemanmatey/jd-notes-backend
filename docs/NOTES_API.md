@@ -70,13 +70,23 @@ Content-Type: application/json
 
 ## Authentication
 
-**Current Status**: All endpoints are currently **public** (no authentication required).  
-**Future**: Will require JWT authentication when user system is integrated.
+**Current Status**: All Notes endpoints are currently **public** (no authentication required for testing).  
+**Production Ready**: The API includes a complete JWT authentication system with 6 endpoints.
 
-When authentication is implemented, include the JWT token in the Authorization header:
+**Available Auth Endpoints**:
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout  
+- `GET /api/auth/me` - Get current user profile
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/change-password` - Change password
+
+When implementing authentication, include the JWT token in the Authorization header:
 ```
 Authorization: Bearer <your-jwt-token>
 ```
+
+**📖 [View Complete Authentication Documentation](./AUTH_API.md)**
 
 ## Endpoints
 

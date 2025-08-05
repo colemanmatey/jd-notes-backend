@@ -26,18 +26,21 @@ This API provides a complete notes management system with user authentication. T
 
 ```
 /api/
-├── auth/          # Authentication endpoints
+├── health         # System health check
+├── auth/          # Authentication endpoints (6 endpoints)
 │   ├── register   # User registration
-│   ├── login      # User login
+│   ├── login      # User login  
 │   ├── logout     # User logout
-│   ├── me         # Get current user
-│   ├── refresh    # Refresh token
-│   └── change-password # Change password
-└── notes/         # Notes management endpoints
-    ├── /          # CRUD operations
-    ├── stats/     # Statistics
-    ├── categories/ # Categories management
-    └── tags/      # Tags management
+│   ├── me         # Get current user profile
+│   ├── refresh    # Refresh access token
+│   └── change-password # Change user password
+└── notes/         # Notes management endpoints (10 endpoints)
+    ├── /          # CRUD operations (GET, POST, PUT, DELETE)
+    ├── /:id/archive   # Archive note
+    ├── /:id/unarchive # Unarchive note
+    ├── stats/overview # Notes statistics
+    ├── categories/list # Available categories
+    └── tags/list  # Available tags
 ```
 
 ---
@@ -46,12 +49,27 @@ This API provides a complete notes management system with user authentication. T
 
 The API uses **JWT (JSON Web Tokens)** for stateless authentication with the following features:
 
-- ✅ User registration with validation
-- ✅ Secure login/logout
+- ✅ User registration with comprehensive validation
+- ✅ Secure login/logout with rate limiting
+- ✅ Account locking after failed attempts
+- ✅ Password strength requirements
+- ✅ Automatic token refresh
+- ✅ Complete error handling and troubleshooting guides
 - ✅ Password strength requirements
 - ✅ Account security (rate limiting, account locking)
-- ✅ Token refresh mechanism
-- ✅ Profile management
+- ✅ Automatic token refresh
+- ✅ Complete error handling and troubleshooting guides
+
+### 🛡️ Error Prevention Features
+
+Our documentation includes comprehensive guides to prevent common frontend integration issues:
+
+- **Detailed Validation Rules** - Exact field requirements and constraints
+- **Complete Error Response Examples** - All possible error scenarios covered
+- **Input Validation Guides** - Prevent 400 validation errors
+- **Rate Limiting Documentation** - Handle 429 rate limit responses  
+- **Troubleshooting Sections** - Step-by-step problem resolution
+- **Testing Checklists** - Verify implementation before deployment
 
 ### Authentication Flow
 
