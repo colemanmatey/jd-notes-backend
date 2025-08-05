@@ -63,6 +63,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       notes: '/api/notes',
+      auth: '/api/auth',
       documentation: 'https://github.com/colemanmatey/jd-notes-backend'
     },
     environment: process.env.NODE_ENV || 'development'
@@ -76,7 +77,7 @@ app.use('*', (req, res) => {
   const errorResponse = {
     error: API_MESSAGES.ROUTE_NOT_FOUND,
     message: `${req.method} ${req.originalUrl} is not a valid endpoint`,
-    availableEndpoints: ['/api/health', '/api/notes'],
+    availableEndpoints: ['/api/health', '/api/notes', '/api/auth'],
     timestamp: new Date().toISOString()
   };
   
