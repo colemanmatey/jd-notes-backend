@@ -96,7 +96,7 @@ app.get('/', (req, res) => {
       health: '/api/health',
       notes: '/api/notes',
       auth: '/api/auth',
-      documentation: 'https://github.com/colemanmatey/jd-notes-backend'
+      documentation: 'https://github.com/colemanmatey/jd-notes-backend/tree/main/docs'
     },
     environment: process.env.NODE_ENV || 'development'
   };

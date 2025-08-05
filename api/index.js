@@ -35,7 +35,7 @@ app.use('/notes', notesRoutes);
 app.use('/auth', authRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   try {
     const healthData = {
       status: 'OK',

@@ -1,6 +1,6 @@
 # JD Notes Backend API Documentation
 
-Welcome to the comprehensive API documentation for the JD Notes Backend. This documentation covers all available endpoints, authentication, data models, and integration examples.
+Welcome to the comprehensive API documentation for the JD Notes Backend. This documentation covers all available endpoints, authentication, data models, error handling, and complete integration examples to prevent internal server errors.
 
 ## 📚 Documentation Overview
 
@@ -8,8 +8,8 @@ This API provides a complete notes management system with user authentication. T
 
 ### 🔗 Quick Links
 
-- **[Authentication API](./AUTH_API.md)** - User registration, login, logout, and profile management
-- **[Notes API](./NOTES_API.md)** - Complete notes CRUD operations, filtering, and statistics
+- **[Authentication API](./AUTH_API.md)** - Complete user authentication system with troubleshooting
+- **[Notes API](./NOTES_API.md)** - Full notes CRUD operations with comprehensive error handling
 
 ---
 
@@ -85,25 +85,56 @@ Our documentation includes comprehensive guides to prevent common frontend integ
 
 ## 📝 Notes Management System
 
-Comprehensive notes management with advanced features:
+Comprehensive notes management with advanced features designed for spiritual note-taking:
 
 - ✅ Full CRUD operations (Create, Read, Update, Delete)
 - ✅ Advanced filtering and search
-- ✅ Categorization and tagging
+- ✅ Spiritual categorization (Sermons, Prayer, Bible Study, etc.)
 - ✅ Priority levels and archiving
 - ✅ Statistics and analytics
 - ✅ Pagination and sorting
+- ✅ Complete validation and error handling
 
 ### Available Categories
-- Personal, Work, Study, Projects, Ideas, Reminders, Other
+- **Sermons**, **Prayer**, **Bible Study**, **General**, **Ministry**, **Personal**
 
-### Note Types
-- Note, Task, Reminder, Idea, Draft
+### Note Types  
+- **sermon**, **prayer**, **study**, **general**, **ministry**, **personal**
 
 ### Priority Levels
-- Low, Medium, High, Urgent
+- **low**, **medium**, **high**
 
 **📖 [View Complete Notes API Documentation](./NOTES_API.md)**
+
+---
+
+## 🚨 Preventing Internal Server Errors
+
+Our documentation is specifically designed to help frontend developers avoid common issues that cause 500 internal server errors:
+
+### ✅ Input Validation Covered
+- All required fields clearly documented
+- Exact validation rules and constraints
+- Valid values for enums (categories, types, priorities)
+- Field length limits and format requirements
+
+### ✅ Error Handling Comprehensive
+- Complete error response examples for all endpoints
+- HTTP status code meanings and appropriate actions
+- Specific error messages and troubleshooting steps
+- Network error handling patterns
+
+### ✅ Data Format Specifications
+- Exact JSON structure for requests and responses
+- Date format requirements (ISO 8601)
+- ObjectId format validation
+- Query parameter constraints
+
+### ✅ Testing Guidance
+- Pre-deployment testing checklists
+- Edge case testing scenarios
+- Common mistake examples and solutions
+- Error reproduction and debugging tips
 
 ---
 
